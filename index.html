@@ -60,6 +60,7 @@
       position: absolute; right: -20px; bottom: 40px;
       font-size: 280px; opacity: 0.04;
       transform: rotate(-15deg);
+      pointer-events: none;
     }
     .hero .badge {
       display: inline-block;
@@ -87,6 +88,7 @@
     }
     .hero-cta {
       display: flex; gap: 14px; flex-wrap: wrap; align-items: center;
+      position: relative; z-index: 2;
     }
     .btn-primary {
       background: var(--red); color: #fff;
