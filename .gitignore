@@ -1,0 +1,9 @@
+# 排除大文件夹和不需要的文件
+课程视频照片素材/
+*.pptx
+*.pdf
+*.md
+*.jsonl
+OpenClaw_*
+openclaw_*
+.DS_Store
