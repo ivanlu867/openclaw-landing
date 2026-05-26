@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw 安装教程 · Windows / Mac 完整指南</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --red: #E84040;
+      --dark: #0f0f0f;
+      --dark2: #1a1a1a;
+      --dark3: #252525;
+      --text: #f0f0f0;
+      --muted: #888;
+    }
+    body {
+      font-family: -apple-system, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 16px;
+    }
+    a { color: var(--red); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(15,15,15,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #222;
+      padding: 14px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    nav .logo { font-weight: 700; font-size: 18px; color: var(--text); }
+    nav .logo span { color: var(--red); }
+    nav .back-btn {
+      background: transparent; color: #aaa;
+      padding: 8px 16px; border-radius: 6px;
+      font-size: 14px; border: 1px solid #333;
+      transition: all 0.2s;
+    }
+    nav .back-btn:hover { color: #fff; border-color: #555; }
+
+    /* HERO */
+    .hero {
+      padding: 120px 24px 60px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .hero .badge {
+      display: inline-block;
+      background: rgba(232,64,64,0.15);
+      border: 1px solid rgba(232,64,64,0.4);
+      color: var(--red);
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 800; line-height: 1.25;
+      margin-bottom: 16px;
+    }
+    .hero .meta {
+      color: var(--muted); font-size: 14px;
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+
+    /* CONTENT */
+    .content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* PLATFORM TOGGLE */
+    .platform-tabs {
+      display: flex; gap: 0;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 40px 0 32px;
+      width: fit-content;
+    }
+    .tab-btn {
+      padding: 12px 28px;
+      background: var(--dark2);
+      color: var(--muted);
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* STEPS */
+    .step {
+      margin-bottom: 48px;
+    }
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px;
+      background: var(--red);
+      border-radius: 50%;
+      font-size: 13px; font-weight: 800;
+      color: #fff;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .step-header {
+      display: flex; align-items: center;
+      margin-bottom: 16px;
+    }
+    .step h2 {
+      font-size: 20px; font-weight: 700;
+      color: #fff;
+    }
+    .step p, .step li {
+      color: #bbb;
+      margin-bottom: 10px;
+    }
+    .step ul, .step ol {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+    .step li { margin-bottom: 8px; }
+
+    /* CODE BLOCK */
+    pre {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-left: 3px solid var(--red);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+    code {
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 14px;
+      color: #e0e0e0;
+      background: #1a1a1a;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    pre code {
+      background: none;
+      padding: 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* NOTE BOX */
+    .note {
+      background: rgba(232,64,64,0.08);
+      border: 1px solid rgba(232,64,64,0.25);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      color: #ccc;
+      font-size: 14px;
+    }
+    .note strong { color: var(--red); }
+
+    /* TABLE */
+    .md-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 14px;
+    }
+    .md-table th {
+      background: var(--dark2);
+      color: var(--red);
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid #333;
+    }
+    .md-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid #222;
+      color: #bbb;
+      vertical-align: top;
+    }
+    .md-table td strong { color: #e0e0e0; }
+    .md-table tr:hover td { background: #161616; }
+
+    /* SECTION DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid #222;
+      margin: 48px 0;
+    }
+
+    /* PLATFORM SECTION */
+    .platform-section { display: none; }
+    .platform-section.active { display: block; }
+
+    /* DIR TREE */
+    .dir-tree {
+      background: #111;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-family: "SF Mono", monospace;
+      font-size: 13px;
+      color: #aaa;
+      line-height: 1.8;
+    }
+    .dir-tree .folder { color: var(--red); }
+    .dir-tree .file { color: #ccc; }
+
+    /* CTA */
+    .cta-box {
+      background: linear-gradient(135deg, #1a0a0a, #1a1a1a);
+      border: 1px solid #333;
+      border-radius: 16px;
+      padding: 40px;
+      text-align: center;
+      margin-top: 64px;
+    }
+    .cta-box h3 { font-size: 22px; margin-bottom: 10px; }
+    .cta-box p { color: var(--muted); margin-bottom: 24px; }
+    .btn-primary {
+      background: var(--red); color: #fff;
+      padding: 14px 32px; border-radius: 8px;
+      font-size: 16px; font-weight: 700;
+      display: inline-block;
+      transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; text-decoration: none; }
+
+    @media (max-width: 600px) {
+      .hero { padding: 100px 16px 40px; }
+      .content { padding: 0 16px 60px; }
+      .cta-box { padding: 24px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Open<span>Claw</span> 🦞</div>
+  <a href="index.html" class="back-btn">← 返回主页</a>
+</nav>
+
+<div class="hero">
+  <div class="badge">📖 官方安装教程</div>
+  <h1>OpenClaw 安装完整教程<br>Windows / Mac 从零到可用</h1>
+  <div class="meta">
+    <span>✍️ 张曦 Jesse</span>
+    <span>📅 2026年3月20日</span>
+    <span>📍 墨尔本</span>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- PLATFORM TABS -->
+  <div class="platform-tabs">
+    <button class="tab-btn active" onclick="switchTab('mac')">🍎 Mac</button>
+    <button class="tab-btn" onclick="switchTab('windows')">🪟 Windows</button>
+  </div>
+
+  <!-- ===== MAC ===== -->
+  <div class="platform-section active" id="section-mac">
+
+    <div class="note">
+      <strong>Mac 用户：</strong>直接在终端安装即可，不需要额外配置环境。
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <h2>安装 OpenClaw</h2>
+      </div>
+      <p>打开终端（Terminal），运行以下命令：</p>
+      <pre><code>sudo curl -fsSL https://openclaw.ai/install.sh | bash</code></pre>
+      <div class="note">
+        <strong>注意：</strong>输入密码时屏幕不会显示任何字符，这是正常的安全机制。直接输入后按 Enter 即可。<br>
+        如果提示安装 Xcode Command Line Tools，按提示安装后继续。
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <h2>完成 Onboarding 配置</h2>
+      </div>
+
+      <p><strong>① 选择 QuickStart</strong><br>第一次使用选 QuickStart。</p>
+
+      <p><strong>② 选择 Provider：OpenAI</strong><br>选 <code>OpenAI (Codex OAuth + API key)</code>。</p>
+
+      <p><strong>③ OpenAI 登录授权</strong></p>
+      <ul>
+        <li>复制终端显示的 URL，粘贴到浏览器</li>
+        <li>用 ChatGPT / OpenAI 账号登录并授权</li>
+        <li>回到终端继续</li>
+      </ul>
+
+      <p><strong>④ 默认模型</strong><br>保持默认即可，之后随时可以更改。</p>
+
+      <p><strong>⑤ 配置 Telegram Bot</strong></p>
+      <ol>
+        <li>打开 Telegram，搜索 <code>@BotFather</code>（官方机器人管理账号）</li>
+        <li>发送命令 <code>/newbot</code></li>
+        <li>设置 Bot 用户名（必须以 <code>bot</code> 结尾，例如 <code>myopenclaw_bot</code>）</li>
+        <li>复制生成的 Token，粘贴回 OpenClaw 终端</li>
+      </ol>
+      <div class="note">
+        <strong>提示：</strong>选项用空格键选中，Enter 键确认。
+      </div>
+
+      <p><strong>⑥ 安装 Skills 依赖</strong><br>按提示继续安装缺少的依赖。暂时不需要的 Skill 可以跳过。</p>
+    </div>
+
+  </div>
+
+  <!-- ===== WINDOWS ===== -->
+  <div class="platform-section" id="section-windows">
+
+    <div class="note">
+      <strong>Windows 用户：</strong>需要先安装 WSL + Ubuntu 24.04，然后在 Ubuntu 内安装 OpenClaw。
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <h2>检查虚拟化是否开启</h2>
+      </div>
+      <p>按 <code>Ctrl + Shift + Esc</code> 打开任务管理器 → 性能 → CPU → 查看「虚拟化：已启用」。</p>
+      <p>如果显示「已禁用」，需要进入 BIOS/UEFI 开启虚拟化后再继续。</p>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <h2>安装 Ubuntu 24.04（WSL）</h2>
+      </div>
+      <p>用管理员权限打开 PowerShell，依次运行：</p>
+      <pre><code>wsl --install -d Ubuntu-24.04</code></pre>
+      <p>如需重启：</p>
+      <pre><code>shutdown /r /t 0</code></pre>
+      <p>重启后验证安装：</p>
+      <pre><code>wsl --list --verbose</code></pre>
+      <p>设置默认版本：</p>
+      <pre><code>wsl --set-default-version 2
+wsl --set-default Ubuntu-24.04</code></pre>
+      <p>进入 Ubuntu（首次会提示设置 Linux 用户名和密码，记住这个密码）：</p>
+      <pre><code>wsl -d Ubuntu-24.04</code></pre>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">3</div>
+        <h2>在 Ubuntu 内安装 OpenClaw</h2>
+      </div>
+      <p>进入 Ubuntu 终端后，运行：</p>
+      <pre><code>sudo curl -fsSL https://openclaw.ai/install.sh | bash</code></pre>
+      <div class="note">
+        <strong>注意：</strong>输入密码时屏幕不会显示任何字符，这是正常的。直接输入 WSL Ubuntu 密码后按 Enter。
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num">4</div>
+        <h2>完成 Onboarding 配置</h2>
+      </div>
+      <p>步骤与 Mac 完全一致：QuickStart → OpenAI 授权 → 配置 Telegram Bot → 安装依赖。</p>
+      <p>详细步骤见 Mac 教程第 2 步。</p>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+
+  <!-- WORKSPACE FILES -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">✦</div>
+      <h2>Workspace 文件配置（重要）</h2>
+    </div>
+    <p>OpenClaw 能否稳定运行，很大程度取决于 Workspace <code>.md</code> 文件是否整理到位，而不是对话频率。</p>
+
+    <p style="margin-top:16px;"><strong>推荐目录结构：</strong></p>
+    <div class="dir-tree">
+      <span class="folder">workspace/</span><br>
+      &nbsp;&nbsp;├── <span class="file">AGENTS.md</span> &nbsp;&nbsp;&nbsp;← 执行规则<br>
+      &nbsp;&nbsp;├── <span class="file">SOUL.md</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 个性与原则<br>
+      &nbsp;&nbsp;├── <span class="file">IDENTITY.md</span> &nbsp;← Agent 元数据<br>
+      &nbsp;&nbsp;├── <span class="file">USER.md</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;← 用户信息<br>
+      &nbsp;&nbsp;├── <span class="file">TOOLS.md</span> &nbsp;&nbsp;&nbsp;&nbsp;← 本地环境配置<br>
+      &nbsp;&nbsp;├── <span class="file">HEARTBEAT.md</span> ← 定期维护清单<br>
+      &nbsp;&nbsp;├── <span class="file">MEMORY.md</span> &nbsp;&nbsp;&nbsp;← 长期记忆偏好<br>
+      &nbsp;&nbsp;└── <span class="folder">memory/</span><br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="file">2026-03-20.md</span>
+    </div>
+
+    <p style="margin-top: 24px;"><strong>常驻注入文件（每次会话都加载）：</strong></p>
+    <table class="md-table">
+      <thead>
+        <tr>
+          <th>文件</th>
+          <th>用途</th>
+          <th>建议</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>AGENTS.md</strong></td>
+          <td>执行规则、安全边界、消息规范</td>
+          <td>引用其他文件，不重复内容</td>
+        </tr>
+        <tr>
+          <td><strong>SOUL.md</strong></td>
+          <td>个性、原则、边界</td>
+          <td>哲学性，简洁；定义「是谁」不是「做什么」</td>
+        </tr>
+        <tr>
+          <td><strong>IDENTITY.md</strong></td>
+          <td>名字、类型、emoji、头像</td>
+          <td>5-10 行，纯事实</td>
+        </tr>
+        <tr>
+          <td><strong>USER.md</strong></td>
+          <td>用户姓名、时区、邮箱、偏好</td>
+          <td>只放个人信息</td>
+        </tr>
+        <tr>
+          <td><strong>TOOLS.md</strong></td>
+          <td>本地配置：频道 ID、token、路径</td>
+          <td>环境配置笔记，不是文档</td>
+        </tr>
+        <tr>
+          <td><strong>HEARTBEAT.md</strong></td>
+          <td>每 30 分钟心跳检查</td>
+          <td>保持极简</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="note">
+      <strong>Token 成本提示：</strong>常驻注入文件总字符建议控制在 20,000 以内。每行都有 token 成本，保持文件精简。
+    </div>
+
+    <p style="margin-top: 24px;"><strong>按需加载文件：</strong></p>
+    <table class="md-table">
+      <thead>
+        <tr>
+          <th>文件</th>
+          <th>用途</th>
+          <th>加载时机</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>MEMORY.md</strong></td>
+          <td>长期学习到的偏好</td>
+          <td>主会话；私聊中加载，群聊排除</td>
+        </tr>
+        <tr>
+          <td><strong>SUBAGENT-POLICY.md</strong></td>
+          <td>子 Agent 触发规则</td>
+          <td>需要子 Agent 决策时</td>
+        </tr>
+        <tr>
+          <td><strong>RESTORE.md</strong></td>
+          <td>实例重建说明</td>
+          <td>新机器初始化时</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 24px;"><strong>五条核心规则：</strong></p>
+    <ol>
+      <li>文件之间不要重复内容，互相引用</li>
+      <li>TOOLS.md 是环境配置笔记，不是文档</li>
+      <li>MEMORY.md 记录学到的偏好，不是重复规则</li>
+      <li>保持文件精简，每一行都有 token 成本</li>
+      <li>Skills 通过 SKILL.md 自我说明，TOOLS.md 专注配置</li>
+    </ol>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h3>想要手把手学会配置？</h3>
+    <p>第四期实操班 · 5月30日（周六）· RMIT 墨尔本<br>现场安装，当天带走当天用</p>
+    <a href="https://jsj.top/f/qNzuhw?x_field_1=%E7%BD%91%E9%A1%B5" class="btn-primary">立即报名 $599 →</a>
+  </div>
+
+</div>
+
+<script>
+  function switchTab(platform) {
+    document.querySelectorAll('.platform-section').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('section-' + platform).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+
+</body>
+</html>
