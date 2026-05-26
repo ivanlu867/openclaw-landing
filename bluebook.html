@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenClaw 使用手册 · 完整实践指南</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --red: #E84040;
+      --dark: #0f0f0f;
+      --dark2: #1a1a1a;
+      --dark3: #252525;
+      --text: #f0f0f0;
+      --muted: #888;
+    }
+    body {
+      font-family: -apple-system, "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+      background: var(--dark);
+      color: var(--text);
+      line-height: 1.8;
+      font-size: 16px;
+    }
+    a { color: var(--red); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: rgba(15,15,15,0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid #222;
+      padding: 14px 24px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    nav .logo { font-weight: 700; font-size: 18px; color: var(--text); }
+    nav .logo span { color: var(--red); }
+    nav .back-btn {
+      color: #aaa; padding: 8px 16px; border-radius: 6px;
+      font-size: 14px; border: 1px solid #333; transition: all 0.2s;
+    }
+    nav .back-btn:hover { color: #fff; border-color: #555; }
+
+    /* LAYOUT */
+    .page-wrap {
+      display: flex;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding-top: 64px;
+    }
+
+    /* SIDEBAR TOC */
+    .toc {
+      width: 260px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+      padding: 32px 20px;
+      border-right: 1px solid #1e1e1e;
+    }
+    .toc-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      color: var(--red); text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .toc a {
+      display: block;
+      font-size: 13px; color: #666;
+      padding: 5px 0;
+      border-left: 2px solid transparent;
+      padding-left: 10px;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .toc a:hover { color: #ccc; border-left-color: var(--red); text-decoration: none; }
+    .toc .toc-section { margin-top: 14px; }
+    .toc .toc-h2 { font-weight: 600; color: #999; font-size: 12px; }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      padding: 40px 48px 80px;
+      min-width: 0;
+    }
+
+    /* HERO */
+    .doc-hero {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid #222;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(232,64,64,0.15);
+      border: 1px solid rgba(232,64,64,0.4);
+      color: var(--red);
+      padding: 5px 12px; border-radius: 20px;
+      font-size: 12px; font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .doc-hero h1 {
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 800; line-height: 1.25;
+      margin-bottom: 12px;
+    }
+    .doc-hero .meta { color: var(--muted); font-size: 14px; }
+
+    /* STATS GRID */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin: 32px 0;
+    }
+    .stat-card {
+      background: var(--dark2);
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .stat-card .num { font-size: 22px; font-weight: 800; color: var(--red); }
+    .stat-card .label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .stat-card .desc { font-size: 13px; color: #888; margin-top: 6px; }
+
+    /* SECTIONS */
+    .doc-section { margin-bottom: 56px; }
+    .doc-section h2 {
+      font-size: 22px; font-weight: 800;
+      margin-bottom: 20px;
+      padding-top: 16px;
+      color: #fff;
+    }
+    .doc-section h3 {
+      font-size: 17px; font-weight: 700;
+      margin: 28px 0 12px;
+      color: #e0e0e0;
+    }
+    .doc-section p { color: #bbb; margin-bottom: 14px; }
+    .doc-section ul, .doc-section ol {
+      padding-left: 20px; margin-bottom: 16px;
+    }
+    .doc-section li { color: #bbb; margin-bottom: 8px; }
+    .doc-section strong { color: #e0e0e0; }
+
+    /* TABLE */
+    .md-table {
+      width: 100%; border-collapse: collapse;
+      margin: 20px 0; font-size: 14px;
+      overflow-x: auto; display: block;
+    }
+    .md-table th {
+      background: var(--dark2); color: var(--red);
+      padding: 10px 14px; text-align: left;
+      font-weight: 700; border-bottom: 2px solid #333;
+      white-space: nowrap;
+    }
+    .md-table td {
+      padding: 10px 14px; border-bottom: 1px solid #1e1e1e;
+      color: #bbb; vertical-align: top;
+    }
+    .md-table tr:hover td { background: #141414; }
+
+    /* CODE */
+    pre {
+      background: #0a0a0a;
+      border: 1px solid #2a2a2a;
+      border-left: 3px solid var(--red);
+      border-radius: 8px;
+      padding: 16px 20px;
+      overflow-x: auto;
+      margin: 14px 0;
+    }
+    code {
+      font-family: "SF Mono", "Fira Code", Consolas, monospace;
+      font-size: 13px; color: #e0e0e0;
+      background: #1a1a1a; padding: 2px 6px; border-radius: 4px;
+    }
+    pre code { background: none; padding: 0; line-height: 1.7; }
+
+    /* CALLOUT */
+    .callout {
+      background: rgba(232,64,64,0.07);
+      border: 1px solid rgba(232,64,64,0.2);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      color: #bbb; font-size: 14px;
+    }
+    .callout strong { color: var(--red); }
+
+    /* TIMELINE */
+    .timeline { margin: 24px 0; }
+    .timeline-item {
+      display: flex; gap: 16px;
+      padding-bottom: 24px;
+      position: relative;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute; left: 71px; top: 24px;
+      width: 1px; height: calc(100% - 12px);
+      background: #2a2a2a;
+    }
+    .timeline-item:last-child::before { display: none; }
+    .timeline-date {
+      width: 70px; flex-shrink: 0;
+      font-size: 12px; color: var(--muted);
+      padding-top: 3px; text-align: right;
+    }
+    .timeline-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--red); flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .timeline-content { flex: 1; }
+    .timeline-content p { margin-bottom: 0; font-size: 14px; }
+
+    /* DIVIDER */
+    hr { border: none; border-top: 1px solid #1e1e1e; margin: 40px 0; }
+
+    /* CTA */
+    .cta-box {
+      background: linear-gradient(135deg, #1a0a0a, #1a1a1a);
+      border: 1px solid #333; border-radius: 16px;
+      padding: 40px; text-align: center; margin-top: 64px;
+    }
+    .cta-box h3 { font-size: 22px; margin-bottom: 10px; }
+    .cta-box p { color: var(--muted); margin-bottom: 24px; }
+    .btn-primary {
+      background: var(--red); color: #fff;
+      padding: 14px 32px; border-radius: 8px;
+      font-size: 16px; font-weight: 700;
+      display: inline-block; transition: opacity 0.2s;
+    }
+    .btn-primary:hover { opacity: 0.85; text-decoration: none; }
+
+    @media (max-width: 768px) {
+      .toc { display: none; }
+      .main { padding: 24px 16px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Open<span>Claw</span> 🦞</div>
+  <a href="index.html" class="back-btn">← 返回主页</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="toc">
+    <div class="toc-title">目录</div>
+    <div class="toc-section">
+      <a class="toc-h2" href="#overview">核心数据</a>
+      <a href="#background">为什么火</a>
+      <a href="#growth">增长历程</a>
+      <a href="#peter">创始人 Peter</a>
+      <a href="#naming">命名大战</a>
+      <a href="#philosophy">设计哲学</a>
+      <a href="#vs-chatgpt">对比 ChatGPT</a>
+      <a href="#culture">"养虾"文化</a>
+      <a href="#who">适合哪些人</a>
+    </div>
+    <div class="toc-section">
+      <a class="toc-h2" href="#deploy">部署指南</a>
+      <a href="#deploy-types">部署形态选择</a>
+      <a href="#macmini">Mac mini 部署</a>
+      <a href="#config-files">配置文件解析</a>
+      <a href="#channels">渠道接入</a>
+      <a href="#troubleshoot">30个报错排查</a>
+    </div>
+    <div class="toc-section">
+      <a class="toc-h2" href="#models">大模型选择</a>
+      <a href="#model-overview">市场全景</a>
+      <a href="#model-review">各模型评测</a>
+      <a href="#routing">智能路由配置</a>
+      <a href="#cost">成本控制</a>
+      <a href="#scenarios">五大场景方案</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="doc-hero">
+      <div class="badge">📘 OpenClaw 蓝皮书</div>
+      <h1>OpenClaw 使用手册<br>完整实践指南</h1>
+      <div class="meta">版本锚点：v2026.3.7 · 面向真正想用 OpenClaw 做事的人</div>
+    </div>
+
+    <!-- STATS -->
+    <div id="overview" class="doc-section">
+      <h2>核心数据一览</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="num">278,932</div>
+          <div class="label">GitHub Stars</div>
+          <div class="desc">已登顶 GitHub，增速超越 React 等老牌项目</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">13,729</div>
+          <div class="label">ClawHub Skills</div>
+          <div class="desc">技能生态已形成规模</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">10万+</div>
+          <div class="label">国内用户</div>
+          <div class="desc">中文社区扩散速度强</div>
+        </div>
+        <div class="stat-card">
+          <div class="num">4个月</div>
+          <div class="label">达到25万星</div>
+          <div class="desc">React 用了 10 年，Vue 用了 7 年</div>
+        </div>
+      </div>
+      <p>OpenClaw 的出现是完全必然的。当模型能力、工具调用能力和多步任务稳定性同时跨过临界点，一个真正能替人执行任务的 Agent 框架出现，只是时间问题。</p>
+      <p>本手册从应用实践视角出发，结合社区一手经验，为真正想用 OpenClaw 做事的人而写。</p>
+    </div>
+
+    <hr>
+
+    <!-- BACKGROUND -->
+    <div id="background" class="doc-section">
+      <h2 id="why-fire">为什么这么火</h2>
+      <h3>AI Agent 时代的三个关键跃升</h3>
+      <ol>
+        <li><strong>工具调用能力成熟</strong> — 模型能判断何时调用 API、传入什么参数，并根据返回结果继续推理</li>
+        <li><strong>多步推理链条稳定</strong> — 新一代模型在连续工具调用场景中的稳定性大幅提升，可较可靠地完成复合任务</li>
+        <li><strong>Agent 框架工程化</strong> — OpenClaw 把 AI 执行多步任务的能力，通过开源、自托管、多平台接入方式交到普通用户手里</li>
+      </ol>
+
+      <h3 id="growth">增长速度历史对比</h3>
+      <table class="md-table">
+        <thead><tr><th>项目</th><th>达到 25 万 Stars 用时</th></tr></thead>
+        <tbody>
+          <tr><td>React</td><td>10 年以上</td></tr>
+          <tr><td>Vue</td><td>7 年以上</td></tr>
+          <tr><td>TensorFlow</td><td>5 年以上</td></tr>
+          <tr><td><strong>OpenClaw</strong></td><td><strong>不到 4 个月</strong></td></tr>
+        </tbody>
+      </table>
+
+      <h3>关键事件时间线</h3>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2025.11</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content"><p>Peter Steinberger 以"周末项目"发布 ClawdBot，一套连接即时通讯平台的 AI 助手原型</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026.01</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content"><p>爆发式增长，72 小时内获得 6 万 Stars，单日峰值 9,000 Stars</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026.01.27</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content"><p>因商标压力被迫短暂改名，最终定名 OpenClaw，保留龙虾主题</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026.02</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content"><p>安全危机集中爆发，包括远程代码执行漏洞和 ClawHub 供应链攻击</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026.02.14</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content"><p>Peter 宣布加入 OpenAI，项目转交开源基金会运营</p></div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">2026.03.03</div>
+          <div class="timeline-dot"></div>
+          <div class="timeline-content"><p>OpenClaw Stars 超过 25 万，成为 GitHub 全球第一软件项目</p></div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- PETER -->
+    <div id="peter" class="doc-section">
+      <h2>创始人：Peter Steinberger</h2>
+      <p>奥地利开发者，在 iOS 和 macOS 开发圈具有较高知名度。曾用 13 年时间把 PSPDFKit 从 PDF 显示库做成运行在 10 亿台设备上的企业级产品，最终完成出售。</p>
+      <p>不到五个月内，他个人在项目上提交了 <strong>11,684 次 commit</strong>。</p>
+      <div class="callout">
+        <strong>核心理念：</strong>"I'm a builder at heart... What I want is to change the world, not build a large company."
+      </div>
+      <h3>马拉喀什的顿悟时刻</h3>
+      <p>Peter 在摩洛哥旅行时发了一条语音消息给自己的 Bot。Bot 没有预设语音识别功能，但它自己识别文件头、尝试调用 FFmpeg、发现本地未安装后，转而用 curl 调用 OpenAI Whisper API，再把转录结果发回。整个过程约 9 秒。</p>
+      <p>这一刻标志着系统从脚本变成了真正的 Agent 雏形——能自主补齐缺失环节。</p>
+
+      <h3 id="naming">命名大战</h3>
+      <ul>
+        <li><strong>OpenCloud</strong> → 收到云服务商商标压力</li>
+        <li><strong>Clade</strong> → 收到 Anthropic 法务邮件："友善但紧迫，请改名"</li>
+        <li><strong>Moltbot（险些失败）</strong> → 消息泄露，5 秒内 GitHub 账号被抢注，30 秒内个人账号被劫持，1 分钟内 NPM 包被抢注。Peter 当时"差点哭出来"</li>
+        <li><strong>OpenClaw</strong> → 直接联系 Anthropic 确认，获批，Anthropic 内部也有点喜欢这个名字</li>
+      </ul>
+    </div>
+
+    <hr>
+
+    <!-- PHILOSOPHY -->
+    <div id="philosophy" class="doc-section">
+      <h2>设计哲学</h2>
+      <h3>80% 的 App 将会消失</h3>
+      <p>如果一个应用的核心只是记录、提醒、查询、填表或调度，这些动作都可能被 Agent 统一接管。日历、邮件、任务管理、票务预订、简单 CRM 最先承压。</p>
+      <p>未来不只是人使用 Agent，而是 Agent 代表人去和其他 Agent 交涉。人类从大量数字流程里退场，变成定义目标、授权边界和做最终判断的人。</p>
+
+      <h3>Skills > MCP：Peter 的鲜明立场</h3>
+      <p>OpenClaw 没有把 MCP 当核心，而是走了 Skills + CLI 的路线。</p>
+      <table class="md-table">
+        <thead><tr><th>MCP 的问题</th><th>Skills 的优势</th></tr></thead>
+        <tbody>
+          <tr><td>会话开始就加载大量 schema，先消耗 token</td><td>先读取简要描述，再决定是否深入加载</td></tr>
+          <tr><td>工具返回信息过多，模型需自行筛选</td><td>与 CLI 天然适配，稳定可组合</td></tr>
+          <tr><td>要求严格 JSON 结构，灵活性小</td><td>优先解决"今天怎样把事做完"</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="vs-chatgpt">与 ChatGPT 的本质区别：顾问 vs 员工</h3>
+      <table class="md-table">
+        <thead><tr><th>维度</th><th>ChatGPT</th><th>OpenClaw</th></tr></thead>
+        <tbody>
+          <tr><td>交互模式</td><td>你问它答，被动响应</td><td>你布置任务，它主动执行</td></tr>
+          <tr><td>运行方式</td><td>网页或 App 内使用</td><td>自托管，可 24/7 在线</td></tr>
+          <tr><td>入口</td><td>主要是自有界面</td><td>Telegram、WhatsApp、飞书、钉钉等多平台</td></tr>
+          <tr><td>模型选择</td><td>以 GPT 系列为主</td><td>可接入 Claude、GPT、Gemini、DeepSeek、Ollama 等</td></tr>
+          <tr><td>数据控制</td><td>平台托管为主</td><td>本地可控，边界更清晰</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr>
+
+    <!-- CULTURE -->
+    <div id="culture" class="doc-section">
+      <h2>"养虾"文化</h2>
+      <p>中文社区把运行和维护 OpenClaw 实例称为"养虾"，用户自称"养虾人"。这不是玩笑，而是它带有社交属性的体现。</p>
+      <ul>
+        <li><strong>降低传播门槛：</strong>"养虾"比"部署 AI Agent"更容易被非技术用户理解</li>
+        <li><strong>制造身份认同：</strong>一旦用户有共同称呼，社区边界就出现了</li>
+        <li><strong>增加社交货币：</strong>"我养了一只虾"比"我搭了个自动化框架"更容易传播</li>
+      </ul>
+      <p>用户不只是配置工具，更像在养一个有性格、会出错、会成长的数字生命体。</p>
+
+      <h3 id="who">适合哪些人</h3>
+      <table class="md-table">
+        <thead><tr><th>人群</th><th>主要动机</th><th>典型玩法</th></tr></thead>
+        <tbody>
+          <tr><td>开发者/技术人员</td><td>完全掌控、可 hack、可自托管</td><td>定制 SOUL.md、自己写 Skills、研究 Agent 架构</td></tr>
+          <tr><td>个人用户/效率控</td><td>真正解放双手，管理数字生活</td><td>接入消息平台，管理邮件、日历、提醒</td></tr>
+          <tr><td>创业者/自由职业者</td><td>把自动化能力包装为服务</td><td>为客户搭建 AI 助手、销售自动化</td></tr>
+          <tr><td>企业用户</td><td>把 Agent 接入内部协作平台</td><td>客服、运营、知识库、内部问答</td></tr>
+          <tr><td>内容创作者</td><td>提高更新频率和分发效率</td><td>选题整理、转写、矩阵化发布</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <hr>
+
+    <!-- DEPLOY -->
+    <div id="deploy" class="doc-section">
+      <h2>部署指南</h2>
+      <h3 id="deploy-types">部署形态选择</h3>
+      <div class="callout">
+        <strong>最容易踩的第一个坑：</strong>不是命令敲错，而是部署形态选错。OpenClaw 不是纯本地桌面工具，更像一套持续在线的 Agent 基础设施。
+      </div>
+      <table class="md-table">
+        <thead><tr><th>部署形态</th><th>适合谁</th><th>优点</th><th>主要代价</th></tr></thead>
+        <tbody>
+          <tr><td>本机临时运行</td><td>只想快速试玩</td><td>最快上手</td><td>电脑休眠即离线</td></tr>
+          <tr><td><strong>Mac mini 常驻</strong></td><td>个人深度用户、小团队</td><td>稳定、低功耗、适合长期在线</td><td>需处理远程访问和系统睡眠策略</td></tr>
+          <tr><td>Linux 主机/NAS</td><td>熟悉命令行的技术用户</td><td>可 24/7 运行，适合 Docker</td><td>桌面浏览器配置更复杂</td></tr>
+          <tr><td>云服务器</td><td>需要公网稳定访问的团队</td><td>外网可达性最好</td><td>安全责任更高，风控更敏感</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="macmini">Mac mini 部署（推荐）</h3>
+      <p><strong>硬件：</strong>M 系列芯片，16GB 内存起步，512GB SSD。</p>
+      <pre><code># 1) 安装 Homebrew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# 2) 安装 Node.js LTS
+brew install node
+
+# 3) 全局安装 OpenClaw
+npm install -g openclaw
+
+# 4) 初始化
+openclaw --version
+openclaw help
+
+# 5) 启动网关
+openclaw gateway start
+openclaw gateway status</code></pre>
+
+      <p><strong>Mac mini 需要补的系统设置：</strong></p>
+      <ul>
+        <li>电源：关闭自动睡眠，允许断电后自动开机</li>
+        <li>登录：确认重启后能恢复到可远程接管状态</li>
+        <li>浏览器：固定使用一套主浏览器和用户数据目录</li>
+        <li>更新：不要让系统在不知情时自动重启</li>
+      </ul>
+
+      <h3 id="config-files">关键配置文件</h3>
+      <table class="md-table">
+        <thead><tr><th>文件</th><th>作用</th><th>建议做法</th></tr></thead>
+        <tbody>
+          <tr><td><code>openclaw.json</code></td><td>网关、节点、插件、模型等核心运行参数</td><td>先从最小可运行配置开始</td></tr>
+          <tr><td><code>AGENTS.md</code></td><td>执行边界、通知规则、数据分级</td><td>当作"系统宪法"，不要写成杂乱备忘录</td></tr>
+          <tr><td><code>SOUL.md</code></td><td>人格、语气、角色边界</td><td>放稳定偏好，不要塞大量流程细节</td></tr>
+          <tr><td><code>TOOLS.md</code></td><td>环境特有映射：设备名、目录路径、渠道 ID</td><td>写具体，不写空话</td></tr>
+          <tr><td><code>memory/</code></td><td>长期记忆、日记、状态文件</td><td>需要定期备份和清理</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>最小配置示例：</strong></p>
+      <pre><code>{
+  "gateway": {
+    "bind": "0.0.0.0:3000",
+    "publicUrl": "https://your-domain.example.com"
+  },
+  "models": {
+    "default": "openai/gpt-5.4",
+    "fallback": "anthropic/claude-sonnet"
+  },
+  "plugins": {
+    "telegram": { "enabled": true },
+    "browser": { "enabled": true }
+  },
+  "logs": { "level": "info" }
+}</code></pre>
+
+      <h3 id="channels">渠道接入</h3>
+      <table class="md-table">
+        <thead><tr><th>渠道</th><th>典型用途</th><th>注意事项</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Telegram</strong></td><td>个人与跨境团队首选</td><td>Bot API 成熟，回调机制清晰</td></tr>
+          <tr><td>WhatsApp</td><td>真实生活入口</td><td>扫码、登录态、封号风险需注意</td></tr>
+          <tr><td>飞书</td><td>内部办公、知识问答</td><td>字段签名和权限范围配置不完整时最容易出问题</td></tr>
+          <tr><td>钉钉</td><td>运营通知、群机器人</td><td>企业安全策略较严，跨网访问提前验证</td></tr>
+          <tr><td>Discord</td><td>开发者社区</td><td>适合技术团队</td></tr>
+          <tr><td>Slack</td><td>国际化团队</td><td>权限粒度细，首次配置容易漏 scope</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="troubleshoot">常见报错排查</h3>
+      <table class="md-table">
+        <thead><tr><th>现象</th><th>高概率原因</th><th>第一步检查</th></tr></thead>
+        <tbody>
+          <tr><td>命令可执行，但消息没有回应</td><td>渠道插件未启用、Webhook 不通、Bot Token 错误</td><td>查网关日志，再查渠道平台的回调状态</td></tr>
+          <tr><td>网页能打开，节点却连不上</td><td>publicUrl 错误、反代头缺失</td><td>从外部网络直接访问公开地址</td></tr>
+          <tr><td>模型调用报 401/403</td><td>API Key 错误、模型名写错</td><td>单独用最小请求验证密钥</td></tr>
+          <tr><td>浏览器自动化突然失灵</td><td>浏览器被系统回收、缺少图形权限</td><td>手动打开浏览器确认会话是否正常</td></tr>
+          <tr><td>扫码后隔段时间掉线</td><td>平台风控、会话失效、机器休眠</td><td>看掉线时间是否与系统睡眠重合</td></tr>
+          <tr><td>技能存在但 Agent 不会用</td><td>SKILL 描述不清、工具权限不足</td><td>先手动执行对应 CLI</td></tr>
+        </tbody>
+      </table>
+
+      <p><strong>排查顺序：</strong>进程层 → 配置层 → 网络层 → 插件层 → 模型层 → 行为层</p>
+      <pre><code>openclaw gateway status
+openclaw gateway restart
+openclaw help</code></pre>
+    </div>
+
+    <hr>
+
+    <!-- MODELS -->
+    <div id="models" class="doc-section">
+      <h2>大模型选择指南</h2>
+      <div class="callout">
+        <strong>最怕的思路：</strong>所有任务都上最贵的那个。这样看起来简单，实际会同时输掉成本、速度和可扩展性。
+      </div>
+
+      <h3 id="model-overview">四个现实判断指标</h3>
+      <ol>
+        <li>工具调用是否稳定</li>
+        <li>长上下文是否真能用</li>
+        <li>价格是否适合高频运行</li>
+        <li>在实际网络环境和多渠道接入条件下，是否容易落地</li>
+      </ol>
+
+      <h3 id="model-review">各模型深度评测</h3>
+      <table class="md-table">
+        <thead><tr><th>阵营</th><th>代表模型</th><th>优势</th><th>适合 OpenClaw 的位置</th></tr></thead>
+        <tbody>
+          <tr><td>Anthropic</td><td>Claude Sonnet / Opus</td><td>写作稳、工具调用自然、长文理解强</td><td>复杂任务主模型、长文整理、研究写作</td></tr>
+          <tr><td>OpenAI</td><td>GPT-4.1 / GPT-5.x</td><td>通用能力均衡，生态成熟，多模态支持广</td><td>默认主模型、代码和工具编排核心</td></tr>
+          <tr><td>Google</td><td>Gemini 2.5 Pro / Flash</td><td>长上下文强，文档与多模态读取出色</td><td>长文检索、资料汇总、附件理解</td></tr>
+          <tr><td>DeepSeek</td><td>DeepSeek-V3 / R1</td><td>价格低，中文表现好，推理性价比高</td><td>低成本默认模型、中文分析、批量处理</td></tr>
+          <tr><td>国产闭源</td><td>豆包、通义、文心、Kimi</td><td>中文生态友好，企业接入和本地合规更容易</td><td>国内业务助手、企业知识库、合规场景</td></tr>
+          <tr><td>本地开源</td><td>Qwen、Llama、Mistral</td><td>可控、低边际成本、数据不出本地</td><td>隐私任务、本地兜底、离线环境</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="routing">智能模型路由配置</h3>
+      <p>个人用户推荐"双层模型栈"，团队用户推荐"路由模型栈"。</p>
+      <pre><code>// 个人用户 - 双模型配置
+{
+  "models": {
+    "default": "anthropic/claude-sonnet",
+    "fallback": "deepseek/deepseek-v3",
+    "profiles": {
+      "writing": "anthropic/claude-sonnet",
+      "daily": "deepseek/deepseek-v3"
+    }
+  }
+}
+
+// 团队用户 - 三层模型配置
+{
+  "models": {
+    "default": "openai/gpt-5.4",
+    "fallback": "anthropic/claude-sonnet",
+    "lowCost": "deepseek/deepseek-v3",
+    "longContext": "google/gemini-2.5-pro",
+    "local": "ollama/qwen3:14b"
+  },
+  "routing": {
+    "rules": [
+      { "match": "attachments|pdf|long-context", "use": "longContext" },
+      { "match": "classification|batch|summary", "use": "lowCost" },
+      { "match": "private|offline", "use": "local" }
+    ]
+  }
+}</code></pre>
+
+      <h3 id="cost">成本控制与优化</h3>
+      <table class="md-table">
+        <thead><tr><th>优化点</th><th>错误做法</th><th>推荐做法</th></tr></thead>
+        <tbody>
+          <tr><td>默认模型</td><td>全站固定使用最强模型</td><td>按任务级别分层，设置默认与升级条件</td></tr>
+          <tr><td>上下文管理</td><td>每次都附带完整聊天历史</td><td>摘要历史，只保留必要上下文</td></tr>
+          <tr><td>工具调用</td><td>任何请求都走全工具链</td><td>先判断是否真的需要工具</td></tr>
+          <tr><td>长文处理</td><td>整包原文直接丢给贵模型</td><td>先切片、提纲化，再交高阶模型总结</td></tr>
+          <tr><td>本地模型</td><td>完全不用本地模型</td><td>把隐私和低价值任务转移到本地</td></tr>
+        </tbody>
+      </table>
+
+      <h3 id="scenarios">五大场景推荐方案</h3>
+      <ul>
+        <li><strong>个人全能助理：</strong>OpenAI 主模型 + DeepSeek 日常副模型</li>
+        <li><strong>内容创作与研究写作：</strong>Claude 主模型 + Gemini 文档模型</li>
+        <li><strong>代码助手与技术运营：</strong>OpenAI 或 Claude 主模型 + 本地模型兜底</li>
+        <li><strong>企业知识库与国内办公：</strong>通义/豆包主模型 + DeepSeek 低成本层</li>
+        <li><strong>隐私优先与离线环境：</strong>Qwen/Llama 本地主模型 + 云端高阶模型人工触发补强</li>
+      </ul>
+
+      <div class="callout">
+        <strong>核心原则：</strong>最好的模型方案不是排行榜第一，而是能连续三个月稳定运行、账单可接受、出问题时你知道怎么救的那一套。把"模型最强"改成"系统最优"。
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box">
+      <h3>想手把手学会配置 OpenClaw？</h3>
+      <p>第四期实操班 · 5月30日（周六）· RMIT 墨尔本<br>现场安装，当天带走当天用</p>
+      <a href="https://jsj.top/f/qNzuhw?x_field_1=%E7%BD%91%E9%A1%B5" class="btn-primary">立即报名 $599 →</a>
+    </div>
+
+  </main>
+</div>
+
+</body>
+</html>
