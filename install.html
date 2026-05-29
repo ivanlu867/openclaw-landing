@@ -235,10 +235,64 @@
     }
     .btn-primary:hover { opacity: 0.85; text-decoration: none; }
 
+    /* SAMPLE FILE TABS */
+    .sample-tabs {
+      display: flex; gap: 0; flex-wrap: wrap;
+      border: 1px solid #333;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 0;
+      width: fit-content;
+    }
+    .sample-tab {
+      padding: 9px 16px;
+      background: var(--dark2);
+      color: var(--muted);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none;
+      font-family: "SF Mono", monospace;
+      transition: all 0.2s;
+      border-right: 1px solid #333;
+    }
+    .sample-tab:last-child { border-right: none; }
+    .sample-tab.active { background: #1e1e1e; color: var(--red); }
+    .sample-tab:hover:not(.active) { color: #ccc; }
+
+    .sample-panel { display: none; margin-top: 0; }
+    .sample-panel.active { display: block; }
+    .sample-panel pre {
+      border-radius: 0 8px 8px 8px;
+      margin-top: 0;
+    }
+    .sample-desc {
+      background: #161616;
+      border: 1px solid #2a2a2a;
+      border-bottom: none;
+      border-radius: 0 8px 0 0;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    /* COPY BUTTON */
+    .copy-btn {
+      position: absolute; top: 10px; right: 12px;
+      background: #2a2a2a;
+      color: #aaa;
+      border: 1px solid #3a3a3a;
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-size: 12px; cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { background: #333; color: #fff; }
+    .copy-btn.copied { background: #1a3a1a; color: #4caf50; border-color: #4caf50; }
+
     @media (max-width: 600px) {
       .hero { padding: 100px 16px 40px; }
       .content { padding: 0 16px 60px; }
       .cta-box { padding: 24px 20px; }
+      .sample-tab { padding: 8px 11px; font-size: 12px; }
     }
   </style>
 </head>
@@ -455,6 +509,147 @@ wsl --set-default Ubuntu-24.04</code></pre>
       <strong>Token 成本提示：</strong>常驻注入文件总字符建议控制在 20,000 以内。每行都有 token 成本，保持文件精简。
     </div>
 
+    <!-- SAMPLE FILES -->
+    <p style="margin-top: 32px; margin-bottom: 16px;"><strong>📄 各文件范例（点击查看 / 复制）：</strong></p>
+
+    <div class="sample-tabs">
+      <button class="sample-tab active" onclick="showSample('identity')">IDENTITY</button>
+      <button class="sample-tab" onclick="showSample('soul')">SOUL</button>
+      <button class="sample-tab" onclick="showSample('user')">USER</button>
+      <button class="sample-tab" onclick="showSample('agents')">AGENTS</button>
+      <button class="sample-tab" onclick="showSample('tools')">TOOLS</button>
+      <button class="sample-tab" onclick="showSample('heartbeat')">HEARTBEAT</button>
+    </div>
+
+    <div class="sample-panel active" id="sample-identity">
+      <div class="sample-desc">Agent 的基本身份信息，5-10 行即可，纯事实。</div>
+      <div style="position:relative;">
+        <button class="copy-btn" onclick="copyCode('code-identity')">复制</button>
+        <pre><code id="code-identity">Name: 小助手
+Type: personal-assistant
+Emoji: 🦞
+Owner: Ivan Lu
+Language: 中文优先，英文备用
+Timezone: Australia/Melbourne</code></pre>
+      </div>
+    </div>
+
+    <div class="sample-panel" id="sample-soul">
+      <div class="sample-desc">Agent 的个性与原则。定义「是谁」，不是「做什么」。</div>
+      <div style="position:relative;">
+        <button class="copy-btn" onclick="copyCode('code-soul')">复制</button>
+        <pre><code id="code-soul">我是你的贴身 AI 助手，永远在线，永远待命。
+
+## 核心原则
+- 优先完成任务，再解释原因
+- 结论在前，理由在后，不说废话
+- 不主动打扰用户，除非有紧急事项
+- 用中文回复，除非用户主动用英文
+
+## 边界
+- 涉及转账、删除文件等不可撤销操作，必须先确认
+- 不存储或转发任何密码、银行账号</code></pre>
+      </div>
+    </div>
+
+    <div class="sample-panel" id="sample-user">
+      <div class="sample-desc">你的个人信息，让 Agent 了解你是谁、你的习惯。</div>
+      <div style="position:relative;">
+        <button class="copy-btn" onclick="copyCode('code-user')">复制</button>
+        <pre><code id="code-user">姓名：Ivan Lu（一凡）
+公司：Autstrip Pty Ltd
+时区：Australia/Melbourne（UTC+10/+11）
+主要语言：中文
+微信：ivanlu867
+邮箱：ivan@autstrip.com.au
+手机：0478 586 867
+
+## 回复偏好
+- 简洁为主，结论在前
+- 不需要解释废话
+- 任务完成后简短确认即可
+
+## 工作场景
+- 主要用于澳洲本地业务（发票、工资、邮件）
+- 偶尔有英文客户，需要中英双语切换</code></pre>
+      </div>
+    </div>
+
+    <div class="sample-panel" id="sample-agents">
+      <div class="sample-desc">Agent 的执行规则和安全边界，引用其他文件，不重复内容。</div>
+      <div style="position:relative;">
+        <button class="copy-btn" onclick="copyCode('code-agents')">复制</button>
+        <pre><code id="code-agents"># 执行规则
+
+## 常驻加载
+@include IDENTITY.md
+@include SOUL.md
+@include USER.md
+@include TOOLS.md
+
+## 消息规范
+- 优先用中文回复
+- 结论在前，理由在后
+- 任务完成后发确认消息，不超过 3 行
+
+## 安全边界
+- 不删除任何文件，除非用户明确确认
+- 涉及银行转账，必须二次确认金额和收款方
+- 不主动向外部发送任何邮件，除非用户授权
+
+## 错误处理
+- 遇到不确定的情况，先问用户，不要自行猜测
+- 失败超过 2 次，停止尝试并报告</code></pre>
+      </div>
+    </div>
+
+    <div class="sample-panel" id="sample-tools">
+      <div class="sample-desc">本地环境配置笔记。填入你自己的 Token 和路径，不对外共享这个文件。</div>
+      <div style="position:relative;">
+        <button class="copy-btn" onclick="copyCode('code-tools')">复制</button>
+        <pre><code id="code-tools"># 本地配置（私密，不要分享给他人）
+
+## Telegram
+Bot Token: 123456789:AAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+My Chat ID: 987654321
+
+## 路径
+工作目录: /Users/ivanlu/workspace
+下载目录: /Users/ivanlu/Downloads
+发票目录: /Users/ivanlu/Documents/Invoices
+
+## 邮箱（如需 Agent 发邮件）
+SMTP Host: smtp.gmail.com
+SMTP Port: 587
+邮箱地址: ivan@autstrip.com.au
+
+## 备注
+- IBKR 账号在 MEMORY.md 单独记录
+- Xero API token 每 30 天刷新一次</code></pre>
+      </div>
+    </div>
+
+    <div class="sample-panel" id="sample-heartbeat">
+      <div class="sample-desc">Agent 每 30 分钟自动执行的心跳检查。保持极简，不要堆功能。</div>
+      <div style="position:relative;">
+        <button class="copy-btn" onclick="copyCode('code-heartbeat')">复制</button>
+        <pre><code id="code-heartbeat"># 心跳检查（每 30 分钟）
+
+## 检查项
+- 检查 Telegram 未读消息
+- 检查今日待办事项
+- 如有紧急邮件，通知用户
+
+## 不在心跳中执行的操作
+- 不主动发邮件
+- 不做任何转账或下单
+- 不删除文件
+
+## 心跳报告格式
+「心跳 HH:MM — 一切正常 / [有 X 条待处理]」</code></pre>
+      </div>
+    </div>
+
     <p style="margin-top: 24px;"><strong>按需加载文件：</strong></p>
     <table class="md-table">
       <thead>
@@ -508,6 +703,23 @@ wsl --set-default Ubuntu-24.04</code></pre>
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById('section-' + platform).classList.add('active');
     event.target.classList.add('active');
+  }
+
+  function showSample(name) {
+    document.querySelectorAll('.sample-panel').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.sample-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('sample-' + name).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function copyCode(id) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = event.target;
+      btn.textContent = '已复制 ✓';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = '复制'; btn.classList.remove('copied'); }, 2000);
+    });
   }
 </script>
 
